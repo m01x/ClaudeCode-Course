@@ -234,3 +234,33 @@ kbd {
 #restart-btn:hover {
   background: #9bbdff;
 }
+
+/* ---- Skin selector ---- */
+.skin-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.skin-btn {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  color: var(--kbd-text);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.skin-btn.active,
+.skin-btn:hover {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+}
+
+.skin-btn.active {
+  background: rgba(122, 162, 247, 0.1);
+}
