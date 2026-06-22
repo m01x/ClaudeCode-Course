@@ -300,3 +300,35 @@ kbd {
   text-align: center;
   padding: 3px 4px;
 }
+
+/* ---- Skin selector ---- */
+.skin-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.skin-btn {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  color: var(--kbd-text);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.skin-btn:hover {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+}
+
+.skin-btn.active {
+  background: #7aa2f7;
+  border-color: #7aa2f7;
+  color: #0f0f17;
+  font-weight: 700;
+}

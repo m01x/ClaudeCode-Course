@@ -30,6 +30,115 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+// ---- Skins ----
+
+const SKINS = {
+  retro: {
+    beforeDraw(ctx, canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = COLORS[colorIndex];
+      context.globalAlpha = alpha ?? 1;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // highlight
+      context.fillStyle = 'rgba(255,255,255,0.12)';
+      context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+      context.globalAlpha = 1;
+    },
+  },
+
+  neon: {
+    beforeDraw(ctx, canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    },
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = COLORS[colorIndex];
+      const a = alpha ?? 1;
+      context.globalAlpha = a;
+      // Fix 6: no shadow on ghost pieces (alpha < 0.5)
+      if (a >= 0.5) {
+        context.shadowBlur = 14;
+        context.shadowColor = color;
+      }
+      context.fillStyle = color;
+      context.fillRect(x * size + 2, y * size + 2, size - 4, size - 4);
+      context.shadowBlur = 0;
+      context.shadowColor = 'transparent';
+      context.globalAlpha = 1;
+    },
+  },
+
+  pastel: {
+    beforeDraw(ctx, canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = COLORS[colorIndex];
+      context.globalAlpha = alpha ?? 1;
+      // Soften the color by blending with white
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      context.fillStyle = 'rgba(255,255,255,0.40)';
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // Soft top highlight
+      context.fillStyle = 'rgba(255,255,255,0.30)';
+      context.fillRect(x * size + 2, y * size + 2, size - 4, 5);
+      context.globalAlpha = 1;
+    },
+  },
+
+  pixel: {
+    beforeDraw(ctx, canvas) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    },
+    drawBlock(context, x, y, colorIndex, size, alpha) {
+      if (!colorIndex) return;
+      const color = COLORS[colorIndex];
+      context.globalAlpha = alpha ?? 1;
+      context.fillStyle = color;
+      context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
+      // Fix 5: cell-centered dots — divide inner area into 3×3 grid
+      const dotSize = 2;
+      const inner = size - 2;
+      const cellSize = Math.floor(inner / 3);
+      const dotOffset = Math.floor((cellSize - dotSize) / 2);
+      context.fillStyle = 'rgba(0,0,0,0.30)';
+      for (let dr = 0; dr < 3; dr++) {
+        for (let dc = 0; dc < 3; dc++) {
+          context.fillRect(
+            x * size + 1 + dc * cellSize + dotOffset,
+            y * size + 1 + dr * cellSize + dotOffset,
+            dotSize, dotSize
+          );
+        }
+      }
+      context.globalAlpha = 1;
+    },
+  },
+};
+
+let currentSkin = SKINS.retro;
+
+// Fix 3: normalize name before storing; Fix 4: redraw nextCanvas immediately
+function applySkin(name) {
+  const validName = SKINS[name] ? name : 'retro';
+  currentSkin = SKINS[validName];
+  localStorage.setItem('tetris-skin', validName);
+  document.querySelectorAll('.skin-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.skin === validName);
+  });
+  if (next) drawNext();
+}
+
+// ---- DOM references ----
+
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
@@ -160,18 +269,6 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
-function drawBlock(context, x, y, colorIndex, size, alpha) {
-  if (!colorIndex) return;
-  const color = COLORS[colorIndex];
-  context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
-  context.globalAlpha = 1;
-}
-
 function drawGrid() {
   ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue('--grid-line').trim();
   ctx.lineWidth = 0.5;
@@ -190,36 +287,38 @@ function drawGrid() {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Fix 1: beforeDraw handles clearing (and neon black fill) — no standalone clearRect
+  currentSkin.beforeDraw(ctx, canvas);
   drawGrid();
 
   // board
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++)
-      drawBlock(ctx, c, r, board[r][c], BLOCK);
+      currentSkin.drawBlock(ctx, c, r, board[r][c], BLOCK);
 
   // ghost
   const gy = ghostY();
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       if (current.shape[r][c])
-        drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
+        currentSkin.drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
 
   // current piece
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
-      drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+      currentSkin.drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
 }
 
 function drawNext() {
   const NB = 30;
-  nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+  // Fix 2: use beforeDraw so neon skin also gets black background on nextCanvas
+  currentSkin.beforeDraw(nextCtx, nextCanvas);
   const shape = next.shape;
   const offX = Math.floor((4 - shape[0].length) / 2);
   const offY = Math.floor((4 - shape.length) / 2);
   for (let r = 0; r < shape.length; r++)
     for (let c = 0; c < shape[r].length; c++)
-      drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB);
+      currentSkin.drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB);
 }
 
 function endGame() {
@@ -315,6 +414,8 @@ restartBtn.addEventListener('click', init);
 resumeBtn.addEventListener('click', togglePause);
 restartPauseBtn.addEventListener('click', init);
 
+// ---- Theme toggle ----
+
 const themeToggle = document.getElementById('theme-toggle');
 const toggleIcon = themeToggle.querySelector('.toggle-icon');
 const toggleLabel = themeToggle.querySelector('.toggle-label');
@@ -339,5 +440,14 @@ themeToggle.addEventListener('click', () => {
   applyTheme(isLight);
   localStorage.setItem('tetris-theme', isLight ? 'light' : 'dark');
 });
+
+// ---- Skin buttons ----
+
+document.querySelectorAll('.skin-btn').forEach(btn => {
+  btn.addEventListener('click', () => applySkin(btn.dataset.skin));
+});
+
+// Restore saved skin (default 'retro')
+applySkin(localStorage.getItem('tetris-skin') || 'retro');
 
 init();
