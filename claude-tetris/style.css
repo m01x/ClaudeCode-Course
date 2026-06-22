@@ -192,6 +192,10 @@ kbd {
   transition: background 0.25s;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .overlay.hidden {
   display: none;
 }
@@ -234,3 +238,110 @@ kbd {
 #restart-btn:hover {
   background: #9bbdff;
 }
+
+/* ---- High Scores ---- */
+#leaderboard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+#scores-list {
+  list-style: none;
+  width: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+#scores-list li {
+  display: grid;
+  grid-template-columns: 18px 32px 1fr auto;
+  gap: 6px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  color: var(--controls-text);
+  padding: 2px 0;
+  align-items: center;
+}
+
+#scores-list li.new-entry {
+  color: #ffd54f;
+  font-weight: 700;
+}
+
+#scores-list .no-scores {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  color: var(--label);
+}
+
+.sc-rank { color: var(--label); }
+.sc-name { font-weight: 700; letter-spacing: 1px; }
+.sc-score { color: #7aa2f7; text-align: right; }
+.sc-meta { color: var(--label); font-size: 10px; }
+
+/* Name entry form */
+#name-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+#name-entry label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--label);
+  font-weight: 600;
+}
+
+#player-name {
+  width: 72px;
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 22px;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 4px 6px;
+  letter-spacing: 4px;
+}
+
+#save-score-btn {
+  background: #7aa2f7;
+  color: #0f0f17;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+#save-score-btn:hover { background: #9bbdff; }
+
+#clear-scores-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--controls-text);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  margin-top: 4px;
+}
+
+#clear-scores-btn:hover { border-color: #e57373; color: #e57373; }
