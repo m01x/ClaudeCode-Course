@@ -50,9 +50,42 @@
 
     <div id="overlay" class="overlay hidden">
       <div class="overlay-box">
-        <p id="overlay-title">GAME OVER</p>
-        <p id="overlay-score"></p>
-        <button id="restart-btn">Reiniciar</button>
+
+        <div id="gameover-section">
+          <p id="overlay-title">GAME OVER</p>
+          <p id="overlay-score"></p>
+          <button id="restart-btn">Reiniciar</button>
+        </div>
+
+        <div id="pause-section" class="hidden">
+          <p class="menu-title">PAUSA</p>
+
+          <div id="pause-main">
+            <button id="resume-btn" class="menu-btn">Reanudar</button>
+            <button id="pause-restart-btn" class="menu-btn">Reiniciar</button>
+            <button id="controls-btn" class="menu-btn">Ver controles</button>
+            <div class="level-row">
+              <span class="level-label">Nivel inicial</span>
+              <div class="level-stepper">
+                <button id="level-dec" class="level-step">−</button>
+                <span id="level-display">1</span>
+                <button id="level-inc" class="level-step">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="controls-view" class="hidden">
+            <ul class="menu-controls-list">
+              <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+              <li><kbd>↑</kbd> / <kbd>X</kbd> rotar</li>
+              <li><kbd>↓</kbd> bajar</li>
+              <li><kbd>Space</kbd> caída rápida</li>
+              <li><kbd>P</kbd> / <kbd>Esc</kbd> pausa</li>
+            </ul>
+            <button id="back-btn" class="menu-btn">Volver</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

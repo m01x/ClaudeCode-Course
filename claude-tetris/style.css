@@ -192,8 +192,8 @@ kbd {
   transition: background 0.25s;
 }
 
-.overlay.hidden {
-  display: none;
+.hidden {
+  display: none !important;
 }
 
 .overlay-box {
@@ -202,6 +202,16 @@ kbd {
   flex-direction: column;
   gap: 12px;
   align-items: center;
+  min-width: 220px;
+}
+
+#gameover-section,
+#pause-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
 }
 
 #overlay-title {
@@ -233,4 +243,119 @@ kbd {
 
 #restart-btn:hover {
   background: #9bbdff;
+}
+
+/* ---- Pause menu ---- */
+.menu-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: #7aa2f7;
+}
+
+#pause-main,
+#controls-view {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.menu-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--text);
+  cursor: pointer;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.menu-btn:hover,
+.menu-btn:focus {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+  background: rgba(122, 162, 247, 0.08);
+  outline: none;
+}
+
+.level-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  gap: 12px;
+}
+
+.level-label {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--label);
+  text-transform: uppercase;
+  font-family: 'Courier New', Courier, monospace;
+  flex: 1;
+  text-align: left;
+  transition: color 0.25s;
+}
+
+.level-stepper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.level-step {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  border-radius: 3px;
+  color: var(--text);
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.level-step:hover {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+}
+
+#level-display {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #7aa2f7;
+  min-width: 20px;
+  text-align: center;
+}
+
+.menu-controls-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.menu-controls-list li {
+  font-size: 12px;
+  color: var(--controls-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  transition: color 0.25s;
 }
