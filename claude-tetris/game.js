@@ -93,6 +93,10 @@ const PIECES = [
 
 const LINE_SCORES = [0, 100, 300, 500, 800];
 
+const RECORDS_KEY = 'tetris-records';
+const MAX_RECORDS = 5;
+
+// ---- DOM refs ----
 const canvas = document.getElementById('board');
 const ctx = canvas.getContext('2d');
 const nextCanvas = document.getElementById('next-canvas');
@@ -100,12 +104,20 @@ const nextCtx = nextCanvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const linesEl = document.getElementById('lines');
 const levelEl = document.getElementById('level');
+const comboEl = document.getElementById('combo');
+const bestScoreEl = document.getElementById('best-score');
 const overlay = document.getElementById('overlay');
-const gameoverSection = document.getElementById('gameover-section');
-const pauseSection = document.getElementById('pause-section');
-const overlayTitle = document.getElementById('overlay-title');
-const overlayScore = document.getElementById('overlay-score');
+const screenStart = document.getElementById('screen-start');
+const screenGameover = document.getElementById('screen-gameover');
+const screenPause = document.getElementById('screen-pause');
+const gameoverStats = document.getElementById('gameover-stats');
+const newRecordSection = document.getElementById('new-record-section');
+const playerNameInput = document.getElementById('player-name');
+const saveRecordBtn = document.getElementById('save-record-btn');
 const restartBtn = document.getElementById('restart-btn');
+const startBtn = document.getElementById('start-btn');
+const resetBtnStart = document.getElementById('reset-btn-start');
+const resetBtnGameover = document.getElementById('reset-btn-gameover');
 const resumeBtn = document.getElementById('resume-btn');
 const pauseRestartBtn = document.getElementById('pause-restart-btn');
 const controlsBtn = document.getElementById('controls-btn');
@@ -119,8 +131,86 @@ const controlsView = document.getElementById('controls-view');
 let startLevel = Math.min(Math.max(parseInt(localStorage.getItem('tetris-start-level'), 10) || 1, 1), 10);
 levelDisplayEl.textContent = startLevel;
 
-let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+// ---- Records ----
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; }
+  catch { return []; }
+}
 
+function saveRecordsToStorage(records) {
+  localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+}
+
+function addRecord(name, playerScore, playerMaxCombo, playerLines) {
+  const records = loadRecords();
+  const entry = { name, score: playerScore, maxCombo: playerMaxCombo, lines: playerLines };
+  records.push(entry);
+  records.sort((a, b) => b.score - a.score);
+  const trimmed = records.slice(0, MAX_RECORDS);
+  saveRecordsToStorage(trimmed);
+  return trimmed.indexOf(entry);
+}
+
+function isTopScore(playerScore) {
+  const records = loadRecords();
+  return records.length < MAX_RECORDS || playerScore > records[MAX_RECORDS - 1].score;
+}
+
+function resetAllRecords() {
+  localStorage.removeItem(RECORDS_KEY);
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function updateBestScore() {
+  const records = loadRecords();
+  bestScoreEl.textContent = records.length ? records[0].score.toLocaleString() : '-';
+}
+
+function renderRecords(containerId, highlightIdx = -1) {
+  const records = loadRecords();
+  const container = document.getElementById(containerId);
+  if (!records.length) {
+    container.innerHTML = '<p class="no-records">Sin récords aún</p>';
+    updateBestScore();
+    return;
+  }
+  const rows = records.map((r, i) => {
+    const cls = i === highlightIdx ? ' class="record-highlight"' : '';
+    return `<tr${cls}><td>${i + 1}</td><td>${escapeHtml(r.name)}</td><td>${r.score.toLocaleString()}</td><td>${r.maxCombo}x</td><td>${r.lines}</td></tr>`;
+  }).join('');
+  container.innerHTML = `<table class="records-table">
+    <thead><tr><th>#</th><th>Nombre</th><th>Puntos</th><th>Combo</th><th>Líneas</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+  updateBestScore();
+}
+
+// ---- Screen management ----
+function showScreen(name) {
+  screenStart.classList.add('hidden');
+  screenGameover.classList.add('hidden');
+  screenPause.classList.add('hidden');
+  if (name) {
+    document.getElementById(`screen-${name}`).classList.remove('hidden');
+    overlay.classList.remove('hidden');
+  } else {
+    overlay.classList.add('hidden');
+  }
+}
+
+// ---- Game state ----
+let board, current, next, score, lines, level, combo, maxCombo;
+let paused, gameOver, gameStarted, lastTime, dropAccum, dropInterval, animId;
+let pendingRecord = false;
+let firstLoad = true;
+
+// ---- Board ----
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
 }
@@ -131,6 +221,7 @@ function randomPiece() {
   return { type, shape, x: Math.floor(COLS / 2) - Math.floor(shape[0].length / 2), y: 0 };
 }
 
+// ---- Collision / rotation ----
 function collide(shape, ox, oy) {
   for (let r = 0; r < shape.length; r++) {
     for (let c = 0; c < shape[r].length; c++) {
@@ -165,6 +256,7 @@ function tryRotate() {
   }
 }
 
+// ---- Merge & clear ----
 function merge() {
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
@@ -185,12 +277,16 @@ function clearLines() {
   if (cleared) {
     lines += cleared;
     score += (LINE_SCORES[cleared] || 0) * level;
+    combo++;
+    if (combo > maxCombo) maxCombo = combo;
     level = Math.max(startLevel, Math.floor(lines / 10) + 1);
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
     updateHUD();
   }
+  return cleared;
 }
 
+// ---- Drop / lock ----
 function ghostY() {
   let gy = current.y;
   while (!collide(current.shape, current.x, gy + 1)) gy++;
@@ -216,7 +312,8 @@ function softDrop() {
 
 function lockPiece() {
   merge();
-  clearLines();
+  const cleared = clearLines();
+  if (cleared === 0) combo = 0;
   spawn();
 }
 
@@ -229,12 +326,15 @@ function spawn() {
   drawNext();
 }
 
+// ---- HUD ----
 function updateHUD() {
   scoreEl.textContent = score.toLocaleString();
   linesEl.textContent = lines;
   levelEl.textContent = level;
+  comboEl.textContent = combo > 1 ? `${combo}x` : '-';
 }
 
+// ---- Draw ----
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   currentSkin.draw(context, x, y, colorIndex, size, alpha);
 }
@@ -259,17 +359,14 @@ function drawGrid() {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   drawGrid();
-
   for (let r = 0; r < ROWS; r++)
     for (let c = 0; c < COLS; c++)
       drawBlock(ctx, c, r, board[r][c], BLOCK);
-
   const gy = ghostY();
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       if (current.shape[r][c])
         drawBlock(ctx, current.x + c, gy + r, current.shape[r][c], BLOCK, 0.2);
-
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
@@ -286,40 +383,47 @@ function drawNext() {
       drawBlock(nextCtx, offX + c, offY + r, shape[r][c], NB);
 }
 
-function showOverlay(isPause) {
-  overlay.classList.remove('hidden');
-  if (isPause) {
-    gameoverSection.classList.add('hidden');
-    pauseSection.classList.remove('hidden');
-    pauseMain.classList.remove('hidden');
-    controlsView.classList.add('hidden');
-  } else {
-    pauseSection.classList.add('hidden');
-    gameoverSection.classList.remove('hidden');
-  }
-}
-
+// ---- Game over ----
 function endGame() {
   gameOver = true;
   cancelAnimationFrame(animId);
-  overlayTitle.textContent = 'GAME OVER';
-  overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
-  showOverlay(false);
+
+  gameoverStats.textContent =
+    `Puntuación: ${score.toLocaleString()} · Líneas: ${lines} · Nivel: ${level} · Combo máx: ${maxCombo}x`;
+
+  if (score > 0 && isTopScore(score)) {
+    pendingRecord = true;
+    newRecordSection.classList.remove('hidden');
+    playerNameInput.value = '';
+    setTimeout(() => playerNameInput.focus(), 50);
+  } else {
+    pendingRecord = false;
+    newRecordSection.classList.add('hidden');
+  }
+
+  renderRecords('records-gameover');
+  showScreen('gameover');
 }
 
+// ---- Pause ----
 function togglePause() {
-  if (gameOver) return;
+  if (!gameStarted || gameOver) return;
   paused = !paused;
   if (!paused) {
     overlay.classList.add('hidden');
     lastTime = performance.now();
-    loop(lastTime);
+    dropAccum = 0;
+    showScreen(null);
+    animId = requestAnimationFrame(loop);
   } else {
     cancelAnimationFrame(animId);
-    showOverlay(true);
+    pauseMain.classList.remove('hidden');
+    controlsView.classList.add('hidden');
+    showScreen('pause');
   }
 }
 
+// ---- Game loop ----
 function loop(ts) {
   const dt = ts - lastTime;
   lastTime = ts;
@@ -337,30 +441,41 @@ function loop(ts) {
   animId = requestAnimationFrame(loop);
 }
 
+// ---- Init ----
 function init() {
   board = createBoard();
   score = 0;
   lines = 0;
   level = startLevel;
+  combo = 0;
+  maxCombo = 0;
   paused = false;
   gameOver = false;
+  pendingRecord = false;
   dropInterval = Math.max(100, 1000 - (startLevel - 1) * 90);
   dropAccum = 0;
-  lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
-  overlay.classList.add('hidden');
   cancelAnimationFrame(animId);
-  animId = requestAnimationFrame(loop);
+
+  if (firstLoad) {
+    firstLoad = false;
+    gameStarted = false;
+    renderRecords('records-start');
+    showScreen('start');
+  } else {
+    gameStarted = true;
+    lastTime = performance.now();
+    showScreen(null);
+    animId = requestAnimationFrame(loop);
+  }
 }
 
+// ---- Event handlers ----
 document.addEventListener('keydown', e => {
-  if (e.code === 'KeyP' || e.code === 'Escape') {
-    if (!gameOver) togglePause();
-    return;
-  }
-  if (paused || gameOver) return;
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
+  if (!gameStarted || paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
       if (!collide(current.shape, current.x - 1, current.y)) current.x--;
@@ -381,6 +496,14 @@ document.addEventListener('keydown', e => {
       break;
   }
   updateHUD();
+});
+
+startBtn.addEventListener('click', () => {
+  gameStarted = true;
+  lastTime = performance.now();
+  dropAccum = 0;
+  showScreen(null);
+  animId = requestAnimationFrame(loop);
 });
 
 restartBtn.addEventListener('click', init);
@@ -418,6 +541,35 @@ levelIncBtn.addEventListener('click', () => {
   }
 });
 
+saveRecordBtn.addEventListener('click', () => {
+  if (!pendingRecord) return;
+  const name = playerNameInput.value.trim() || 'Anónimo';
+  pendingRecord = false;
+  const idx = addRecord(name, score, maxCombo, lines);
+  newRecordSection.classList.add('hidden');
+  renderRecords('records-gameover', idx);
+});
+
+playerNameInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveRecordBtn.click();
+  e.stopPropagation();
+});
+
+resetBtnStart.addEventListener('click', () => {
+  if (!confirm('¿Borrar todos los récords?')) return;
+  resetAllRecords();
+  renderRecords('records-start');
+});
+
+resetBtnGameover.addEventListener('click', () => {
+  if (!confirm('¿Borrar todos los récords?')) return;
+  resetAllRecords();
+  pendingRecord = false;
+  newRecordSection.classList.add('hidden');
+  renderRecords('records-gameover');
+});
+
+// ---- Theme ----
 const themeToggle = document.getElementById('theme-toggle');
 const toggleIcon = themeToggle.querySelector('.toggle-icon');
 const toggleLabel = themeToggle.querySelector('.toggle-label');

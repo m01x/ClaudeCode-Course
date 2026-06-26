@@ -22,12 +22,20 @@
           <span class="value" id="score">0</span>
         </div>
         <div class="panel-section">
+          <span class="label">BEST</span>
+          <span class="value best-value" id="best-score">-</span>
+        </div>
+        <div class="panel-section">
           <span class="label">LINES</span>
           <span class="value" id="lines">0</span>
         </div>
         <div class="panel-section">
           <span class="label">LEVEL</span>
           <span class="value" id="level">1</span>
+        </div>
+        <div class="panel-section">
+          <span class="label">COMBO</span>
+          <span class="value combo-value" id="combo">-</span>
         </div>
 
         <div class="panel-section">
@@ -61,14 +69,36 @@
     <div id="overlay" class="overlay hidden">
       <div class="overlay-box">
 
-        <div id="gameover-section">
-          <p id="overlay-title">GAME OVER</p>
-          <p id="overlay-score"></p>
-          <button id="restart-btn">Reiniciar</button>
+        <!-- Pantalla de inicio -->
+        <div id="screen-start" class="screen hidden">
+          <p class="screen-title title-blue">TETRIS</p>
+          <div id="records-start" class="records-container"></div>
+          <button id="start-btn" class="btn-primary">INICIAR JUEGO</button>
+          <button id="reset-btn-start" class="btn-reset">Borrar récords</button>
         </div>
 
-        <div id="pause-section" class="hidden">
-          <p class="menu-title">PAUSA</p>
+        <!-- Pantalla de game over -->
+        <div id="screen-gameover" class="screen hidden">
+          <p class="screen-title title-red">GAME OVER</p>
+          <p id="gameover-stats" class="gameover-stats"></p>
+          <div id="new-record-section" class="new-record-section hidden">
+            <p class="new-record-badge">¡NUEVO RÉCORD!</p>
+            <div class="name-row">
+              <input id="player-name" type="text" class="name-input" maxlength="12"
+                     placeholder="Tu nombre…" autocomplete="off" />
+              <button id="save-record-btn" class="btn-primary">Guardar</button>
+            </div>
+          </div>
+          <div id="records-gameover" class="records-container"></div>
+          <div class="overlay-actions">
+            <button id="restart-btn" class="btn-primary">Reiniciar</button>
+            <button id="reset-btn-gameover" class="btn-reset">Borrar récords</button>
+          </div>
+        </div>
+
+        <!-- Pantalla de pausa -->
+        <div id="screen-pause" class="screen hidden">
+          <p class="screen-title title-blue">PAUSA</p>
 
           <div id="pause-main">
             <button id="resume-btn" class="menu-btn">Reanudar</button>
@@ -95,7 +125,6 @@
             <button id="back-btn" class="menu-btn">Volver</button>
           </div>
         </div>
-
       </div>
     </div>
   </div>
