@@ -234,3 +234,156 @@ kbd {
 #restart-btn:hover {
   background: #9bbdff;
 }
+
+/* ---- Skin selector ---- */
+.skin-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.skin-btn {
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--toggle-text);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-align: left;
+  width: 100%;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.skin-btn:hover {
+  border-color: #7aa2f7;
+  color: #7aa2f7;
+}
+
+.skin-btn.active {
+  background: #7aa2f7;
+  color: #0f0f17;
+  border-color: #7aa2f7;
+  font-weight: 700;
+}
+
+/* ---- Neon skin ---- */
+body[data-skin="neon"] {
+  --bg: #050508;
+  --canvas-bg: #000005;
+  --grid-line: #0c0c12;
+  --border: #200a3e;
+  --text: #e0e0ff;
+  --label: #604080;
+  --controls-text: #6050a0;
+  --kbd-bg: #0a0818;
+  --kbd-border: #2a1050;
+  --kbd-text: #8060c0;
+  --toggle-bg: #0a0818;
+  --toggle-border: #2a1050;
+  --toggle-text: #8060c0;
+  --overlay-bg: rgba(0, 0, 10, 0.88);
+}
+
+body[data-skin="neon"] .game-title {
+  color: #00fff5;
+  text-shadow: 0 0 15px #00fff5, 0 0 40px rgba(0, 255, 245, 0.4);
+}
+
+body[data-skin="neon"] .value {
+  color: #00fff5;
+  text-shadow: 0 0 8px rgba(0, 255, 245, 0.6);
+}
+
+body[data-skin="neon"] #board,
+body[data-skin="neon"] #next-canvas {
+  border-color: #0a0020;
+  box-shadow: 0 0 24px rgba(0, 255, 245, 0.12), 0 0 60px rgba(0, 0, 0, 0.9);
+}
+
+body[data-skin="neon"] .skin-btn.active {
+  background: #00fff5;
+  color: #000010;
+  border-color: #00fff5;
+  box-shadow: 0 0 8px rgba(0, 255, 245, 0.5);
+}
+
+/* ---- Pastel skin ---- */
+body[data-skin="pastel"] {
+  --bg: #faf5ff;
+  --canvas-bg: #f0e8ff;
+  --grid-line: #ddd0f5;
+  --border: #c8b4e8;
+  --text: #4a3060;
+  --label: #8060a0;
+  --controls-text: #6050a0;
+  --kbd-bg: #ece0ff;
+  --kbd-border: #c0a8e0;
+  --kbd-text: #5040a0;
+  --toggle-bg: #ece0ff;
+  --toggle-border: #c0a8e0;
+  --toggle-text: #5040a0;
+  --overlay-bg: rgba(210, 190, 240, 0.88);
+}
+
+body[data-skin="pastel"] .game-title {
+  color: #a070d0;
+  text-shadow: 0 0 12px rgba(160, 112, 208, 0.4);
+}
+
+body[data-skin="pastel"] .value {
+  color: #a070d0;
+}
+
+body[data-skin="pastel"] #board,
+body[data-skin="pastel"] #next-canvas {
+  box-shadow: 0 4px 20px rgba(160, 112, 208, 0.2);
+}
+
+body[data-skin="pastel"] .skin-btn.active {
+  background: #c8a8f0;
+  color: #fff;
+  border-color: #c8a8f0;
+}
+
+/* ---- Pixel skin ---- */
+body[data-skin="pixel"] {
+  --bg: #0d0d0d;
+  --canvas-bg: #000000;
+  --grid-line: #1a1a1a;
+  --border: #333333;
+  --text: #cccccc;
+  --label: #555555;
+  --controls-text: #666666;
+  --kbd-bg: #1a1a1a;
+  --kbd-border: #333333;
+  --kbd-text: #888888;
+  --toggle-bg: #1a1a1a;
+  --toggle-border: #333333;
+  --toggle-text: #888888;
+  --overlay-bg: rgba(0, 0, 0, 0.88);
+}
+
+body[data-skin="pixel"] .game-title {
+  color: #00b8d4;
+  text-shadow: none;
+  letter-spacing: 12px;
+}
+
+body[data-skin="pixel"] .value {
+  color: #00b8d4;
+}
+
+body[data-skin="pixel"] #board,
+body[data-skin="pixel"] #next-canvas {
+  box-shadow: none;
+  border-color: #333;
+}
+
+body[data-skin="pixel"] .skin-btn.active {
+  background: #00b8d4;
+  color: #000;
+  border-color: #00b8d4;
+}
