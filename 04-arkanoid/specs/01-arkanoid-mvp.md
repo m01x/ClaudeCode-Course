@@ -1,6 +1,6 @@
 # SPEC 01 — MVP jugable de Arkanoid (M10xaloid)
 
-> **Status:** Draft
+> **Status:** Implemented
 > **Depends on:** Ninguno (primer spec del proyecto)
 > **Date:** 2026-07-06
 > **Objective:** Construir un MVP jugable de Arkanoid en HTML/CSS/JS vanilla, con un nivel fijo, control por teclado, vidas, puntuación por bloque, pantalla de inicio con logo, pausa, y pantallas de victoria/derrota con reinicio.
