@@ -98,24 +98,24 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] El juego carga en `index.html` sin errores en la consola.
-- [ ] La pantalla de inicio muestra el logo "M10xaloid" y el texto "Presiona ESPACIO para iniciar".
-- [ ] Presionar Espacio en la pantalla de inicio comienza la partida (`screen: 'playing'`).
-- [ ] El paddle se mueve con las flechas ←/→ y con A/D, sin salirse de los límites del canvas.
-- [ ] La bola arranca enganchada al paddle y se lanza al presionar Espacio.
-- [ ] El ángulo de rebote de la bola contra el paddle cambia según el punto de impacto.
-- [ ] La bola rebota correctamente contra las paredes superior, izquierda y derecha del canvas.
-- [ ] Los bloques se renderizan en una grilla fija de `BLOCK_ROWS` × `BLOCK_COLS` con los colores definidos en `BLOCK_ROW_COLORS`.
-- [ ] Al golpear un bloque, este desaparece, se reproduce la animación de explosión de 4 frames y suena `break-sound.mp3`.
-- [ ] Cada bloque roto suma exactamente `BLOCK_SCORE_VALUE` puntos al score.
-- [ ] Cada rebote de la bola en pared o paddle reproduce `ball-bounce.mp3`.
-- [ ] El HUD muestra el score y las vidas restantes actualizados en tiempo real durante `playing`.
-- [ ] Cuando la bola cae debajo del paddle, se resta una vida y la bola se reengancha al paddle (si quedan vidas).
-- [ ] Al llegar a 0 vidas, aparece la pantalla de "Game Over" con el score final y opción de reiniciar.
-- [ ] Al destruir todos los bloques del nivel, aparece la pantalla de "¡Ganaste!" con el score final y opción de reiniciar.
-- [ ] Presionar Espacio en las pantallas de Game Over o Victoria resetea score, vidas, bloques, paddle y bola, y vuelve a la pantalla de inicio.
-- [ ] Presionar P durante `playing` pausa el juego (congela el loop) y muestra un overlay "PAUSADO"; presionar P de nuevo reanuda.
-- [ ] El puntaje no se conserva al recargar la página (no hay persistencia en este MVP).
+- [x] El juego carga en `index.html` sin errores en la consola.
+- [x] La pantalla de inicio muestra el logo "M10xaloid" y el texto "Presiona ESPACIO para iniciar".
+- [x] Presionar Espacio en la pantalla de inicio comienza la partida (`screen: 'playing'`).
+- [x] El paddle se mueve con las flechas ←/→ y con A/D, sin salirse de los límites del canvas.
+- [x] La bola arranca enganchada al paddle y se lanza al presionar Espacio.
+- [x] El ángulo de rebote de la bola contra el paddle cambia según el punto de impacto.
+- [x] La bola rebota correctamente contra las paredes superior, izquierda y derecha del canvas.
+- [x] Los bloques se renderizan en una grilla fija de `BLOCK_ROWS` × `BLOCK_COLS` con los colores definidos en `BLOCK_ROW_COLORS`.
+- [x] Al golpear un bloque, este desaparece, se reproduce la animación de explosión de 4 frames y suena `break-sound.mp3`.
+- [x] Cada bloque roto suma exactamente `BLOCK_SCORE_VALUE` puntos al score.
+- [x] Cada rebote de la bola en pared o paddle reproduce `ball-bounce.mp3`.
+- [x] El HUD muestra el score y las vidas restantes actualizados en tiempo real durante `playing`.
+- [x] Cuando la bola cae debajo del paddle, se resta una vida y la bola se reengancha al paddle (si quedan vidas).
+- [x] Al llegar a 0 vidas, aparece la pantalla de "Game Over" con el score final y opción de reiniciar.
+- [x] Al destruir todos los bloques del nivel, aparece la pantalla de "¡Ganaste!" con el score final y opción de reiniciar.
+- [x] Presionar Espacio en las pantallas de Game Over o Victoria resetea score, vidas, bloques, paddle y bola, y vuelve a la pantalla de inicio.
+- [x] Presionar P durante `playing` pausa el juego (congela el loop) y muestra un overlay "PAUSADO"; presionar P de nuevo reanuda.
+- [x] El puntaje no se conserva al recargar la página (no hay persistencia en este MVP).
 
 ## Decisions
 
