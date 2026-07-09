@@ -52,9 +52,13 @@ const state = {
   },
   ball: { x: 0, y: 0, dx: 0, dy: 0, radius: BALL_RADIUS, attached: true },
   blocks: [],
+  muted: true,
 };
 
 const explosions = [];
+
+// Ícono de mute: esquina superior derecha del HUD, debajo de "Vidas: X" (que está en y=28)
+const MUTE_ICON = { x: CANVAS_WIDTH - 36, y: 40, size: 20 };
 
 const BLOCK_GRID_OFFSET_X = ( CANVAS_WIDTH - BLOCK_COLS * BLOCK_WIDTH ) / 2;
 const BLOCK_GRID_OFFSET_Y = 60;
@@ -95,6 +99,8 @@ const ballBounceSound = new Audio( 'assets/sounds/ball-bounce.mp3' );
 const breakSound = new Audio( 'assets/sounds/break-sound.mp3' );
 
 function playSound( sound ) {
+  if ( state.muted ) return;
+
   const instance = sound.cloneNode();
   instance.play().catch( () => {} );
 }
@@ -153,6 +159,12 @@ window.addEventListener( 'keydown', ( e ) => {
       state.screen = 'paused';
     } else if ( state.screen === 'paused' ) {
       state.screen = 'playing';
+    }
+  }
+
+  if ( e.code === 'KeyM' ) {
+    if ( state.screen === 'playing' || state.screen === 'paused' ) {
+      state.muted = !state.muted;
     }
   }
 
@@ -384,6 +396,40 @@ function renderHUD() {
   ctx.fillText( `Vidas: ${ state.lives }`, CANVAS_WIDTH - 16, 28 );
 }
 
+function drawMuteIcon( ctx ) {
+  const { x, y, size } = MUTE_ICON;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2;
+
+  // Trapecio: cuerpo (rectángulo) + cono de la bocina
+  ctx.beginPath();
+  ctx.moveTo( x, y + size * 0.35 );
+  ctx.lineTo( x + size * 0.4, y + size * 0.35 );
+  ctx.lineTo( x + size * 0.7, y + size * 0.1 );
+  ctx.lineTo( x + size * 0.7, y + size * 0.9 );
+  ctx.lineTo( x + size * 0.4, y + size * 0.65 );
+  ctx.lineTo( x, y + size * 0.65 );
+  ctx.closePath();
+  ctx.fill();
+
+  if ( state.muted ) {
+    ctx.beginPath();
+    ctx.moveTo( x, y );
+    ctx.lineTo( x + size, y + size );
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc( x + size * 0.7, y + size * 0.5, size * 0.25, -Math.PI / 4, Math.PI / 4 );
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc( x + size * 0.7, y + size * 0.5, size * 0.4, -Math.PI / 4, Math.PI / 4 );
+    ctx.stroke();
+  }
+}
+
 function renderExplosions() {
   for ( const explosion of explosions ) {
     const frame = EXPLOSION_FRAMES[ explosion.color ][ explosion.frameIndex ];
@@ -397,6 +443,7 @@ function renderPlayingScene() {
   renderPaddle();
   renderBall();
   renderHUD();
+  drawMuteIcon( ctx );
 }
 
 function renderPauseOverlay() {
