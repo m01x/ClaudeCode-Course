@@ -1,6 +1,6 @@
 # SPEC 02 — Progresión de niveles
 
-> **Status:** Draft
+> **Status:** Approved
 > **Depends on:** SPEC 01
 > **Date:** 2026-07-08
 > **Objective:** Añadir progresión de 10 niveles al Arkanoid: al vaciar los bloques de la pantalla, el jugador confirma con Espacio el paso al siguiente nivel, que trae una nueva distribución de bloques generada proceduralmente, una bola más rápida, y —desde el nivel 3 en adelante— un paddle más pequeño.
@@ -78,18 +78,18 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] Al vaciar los bloques del nivel 1 (con `level < 10`), el juego se congela y aparece un overlay "Nivel 1 completado - Presiona ESPACIO para continuar".
-- [ ] Presionar Espacio en el overlay pasa a `level 2`, genera una nueva distribución de bloques y vuelve a `'playing'`.
+- [x] Al vaciar los bloques del nivel 1 (con `level < 10`), el juego se congela y aparece un overlay "Nivel 1 completado - Presiona ESPACIO para continuar".
+- [x] Presionar Espacio en el overlay pasa a `level 2`, genera una nueva distribución de bloques y vuelve a `'playing'`.
 - [ ] La velocidad de la bola en el nivel 2 es mayor que en el nivel 1, y en el nivel 3 mayor que en el nivel 2, siguiendo `speedForLevel`.
-- [ ] La velocidad de la bola nunca supera `BALL_MAX_SPEED` (12) sin importar el nivel.
-- [ ] Desde el nivel 3 en adelante el paddle mide `PADDLE_WIDTH_REDUCED` (70px) en vez de 100px.
-- [ ] En los niveles 1 y 2 el paddle mide el ancho base (100px).
-- [ ] Cada nivel usa `rowsForLevel(level)` filas de bloques (tope en 8) con colores rotados según `BLOCK_COLORS`.
-- [ ] El score y las vidas no se resetean al pasar de un nivel a otro.
-- [ ] El HUD muestra el nivel actual en todo momento durante `'playing'`, `'paused'` y `'levelup'`.
-- [ ] Al vaciar los bloques del nivel 10, aparece la pantalla de victoria (`'win'`) existente con el score final acumulado (no aparece el overlay de `'levelup'`).
-- [ ] Al reiniciar desde Game Over o Victoria, el juego vuelve a nivel 1 con paddle de ancho base y velocidad de bola base.
-- [ ] Perder una vida en cualquier nivel > 1 reengancha la bola al paddle sin resetear el nivel, el score ni la distribución de bloques restante.
+- [x] La velocidad de la bola nunca supera `BALL_MAX_SPEED` (12) sin importar el nivel.
+- [x] Desde el nivel 3 en adelante el paddle mide `PADDLE_WIDTH_REDUCED` (70px) en vez de 100px.
+- [x] En los niveles 1 y 2 el paddle mide el ancho base (100px).
+- [x] Cada nivel usa `rowsForLevel(level)` filas de bloques (tope en 8) con colores rotados según `BLOCK_COLORS`.
+- [x] El score y las vidas no se resetean al pasar de un nivel a otro.
+- [x] El HUD muestra el nivel actual en todo momento durante `'playing'`, `'paused'` y `'levelup'`.
+- [x] Al vaciar los bloques del nivel 10, aparece la pantalla de victoria (`'win'`) existente con el score final acumulado (no aparece el overlay de `'levelup'`).
+- [x] Al reiniciar desde Game Over o Victoria, el juego vuelve a nivel 1 con paddle de ancho base y velocidad de bola base.
+- [x] Perder una vida en cualquier nivel > 1 reengancha la bola al paddle sin resetear el nivel, el score ni la distribución de bloques restante.
 
 ## Decisions
 

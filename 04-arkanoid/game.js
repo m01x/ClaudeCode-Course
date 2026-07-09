@@ -3,21 +3,47 @@ const CANVAS_HEIGHT = 600;
 
 const PADDLE = { width: 100, height: 16, speed: 7 };
 const BALL_RADIUS = 8;
-const BALL_INITIAL_SPEED = 5;
 
 const STARTING_LIVES = 3;
 const BLOCK_SCORE_VALUE = 10;
 
-const BLOCK_ROWS = 5;
 const BLOCK_COLS = 10;
 const BLOCK_WIDTH = 64;
 const BLOCK_HEIGHT = 24;
-const BLOCK_ROW_COLORS = [ 'red', 'yellow', 'cyan', 'magenta', 'hotpink' ];
+
+const MAX_LEVEL = 10;
+
+// Ancho de paddle: base hasta nivel 2, reducido desde nivel 3 en adelante
+const PADDLE_WIDTH_BASE = 100;
+const PADDLE_WIDTH_REDUCED = 70; // aplica desde level >= 3
+
+// Velocidad de bola: crece 1px/frame por nivel, con tope
+const BALL_BASE_SPEED = 5;
+const BALL_SPEED_INCREMENT = 1; // por nivel
+const BALL_MAX_SPEED = 12;
+
+// Bloques: filas crecen con el nivel, tope en 8; columnas fijas en 10
+const BLOCK_ROWS_BASE = 5;
+const BLOCK_ROWS_MAX = 8;
+const BLOCK_COLORS = [ 'gray', 'red', 'yellow', 'cyan', 'magenta', 'hotpink', 'green' ];
+
+function speedForLevel( level ) {
+  return Math.min( BALL_BASE_SPEED + BALL_SPEED_INCREMENT * ( level - 1 ), BALL_MAX_SPEED );
+}
+
+function rowsForLevel( level ) {
+  return Math.min( BLOCK_ROWS_BASE + ( level - 1 ), BLOCK_ROWS_MAX );
+}
+
+function paddleWidthForLevel( level ) {
+  return level >= 3 ? PADDLE_WIDTH_REDUCED : PADDLE_WIDTH_BASE;
+}
 
 const state = {
-  screen: 'start', // 'start' | 'playing' | 'paused' | 'gameover' | 'win'
+  screen: 'start', // 'start' | 'playing' | 'paused' | 'levelup' | 'gameover' | 'win'
   score: 0,
   lives: STARTING_LIVES,
+  level: 1, // 1..MAX_LEVEL
   paddle: {
     x: ( CANVAS_WIDTH - PADDLE.width ) / 2,
     y: CANVAS_HEIGHT - 40,
@@ -33,11 +59,12 @@ const explosions = [];
 const BLOCK_GRID_OFFSET_X = ( CANVAS_WIDTH - BLOCK_COLS * BLOCK_WIDTH ) / 2;
 const BLOCK_GRID_OFFSET_Y = 60;
 
-function generateBlocks() {
+function createBlocksForLevel( level ) {
   const blocks = [];
+  const rows = rowsForLevel( level );
 
-  for ( let row = 0; row < BLOCK_ROWS; row++ ) {
-    const color = BLOCK_ROW_COLORS[ row ];
+  for ( let row = 0; row < rows; row++ ) {
+    const color = BLOCK_COLORS[ ( row + level - 1 ) % BLOCK_COLORS.length ];
 
     for ( let col = 0; col < BLOCK_COLS; col++ ) {
       blocks.push( {
@@ -54,7 +81,7 @@ function generateBlocks() {
   return blocks;
 }
 
-state.blocks = generateBlocks();
+state.blocks = createBlocksForLevel( state.level );
 
 const canvas = document.getElementById( 'game-canvas' );
 const ctx = canvas.getContext( '2d' );
@@ -82,15 +109,17 @@ const keys = {
 function resetGame() {
   state.score = 0;
   state.lives = STARTING_LIVES;
+  state.level = 1;
 
-  state.paddle.x = ( CANVAS_WIDTH - PADDLE.width ) / 2;
+  state.paddle.width = PADDLE_WIDTH_BASE;
+  state.paddle.x = ( CANVAS_WIDTH - state.paddle.width ) / 2;
   state.paddle.y = CANVAS_HEIGHT - 40;
 
   state.ball.attached = true;
   state.ball.dx = 0;
   state.ball.dy = 0;
 
-  state.blocks = generateBlocks();
+  state.blocks = createBlocksForLevel( state.level );
   explosions.length = 0;
 
   state.screen = 'start';
@@ -104,9 +133,18 @@ window.addEventListener( 'keydown', ( e ) => {
     } else if ( state.screen === 'playing' && state.ball.attached ) {
       state.ball.attached = false;
       state.ball.dx = 0;
-      state.ball.dy = -BALL_INITIAL_SPEED;
+      state.ball.dy = -speedForLevel( state.level );
     } else if ( state.screen === 'gameover' || state.screen === 'win' ) {
       resetGame();
+    } else if ( state.screen === 'levelup' ) {
+      state.level += 1;
+      state.blocks = createBlocksForLevel( state.level );
+      state.paddle.width = paddleWidthForLevel( state.level );
+      state.paddle.x = Math.max( 0, Math.min( CANVAS_WIDTH - state.paddle.width, state.paddle.x ) );
+      state.ball.attached = true;
+      state.ball.dx = 0;
+      state.ball.dy = 0;
+      state.screen = 'playing';
     }
   }
 
@@ -194,8 +232,9 @@ function updateBall() {
     const maxAngle = Math.PI / 3; // 60 degrees
     const angle = ( hitPos - 0.5 ) * 2 * maxAngle;
 
-    ball.dx = BALL_INITIAL_SPEED * Math.sin( angle );
-    ball.dy = -BALL_INITIAL_SPEED * Math.cos( angle );
+    const speed = speedForLevel( state.level );
+    ball.dx = speed * Math.sin( angle );
+    ball.dy = -speed * Math.cos( angle );
     ball.y = paddle.y - ball.radius;
     playSound( ballBounceSound );
   }
@@ -243,7 +282,7 @@ function updateBlockCollisions() {
     playSound( breakSound );
 
     if ( state.blocks.every( ( b ) => !b.active ) ) {
-      state.screen = 'win';
+      state.screen = state.level < MAX_LEVEL ? 'levelup' : 'win';
     }
 
     break;
@@ -338,6 +377,9 @@ function renderHUD() {
   ctx.textAlign = 'left';
   ctx.fillText( `Score: ${ state.score }`, 16, 28 );
 
+  ctx.textAlign = 'center';
+  ctx.fillText( `Nivel: ${ state.level }`, CANVAS_WIDTH / 2, 28 );
+
   ctx.textAlign = 'right';
   ctx.fillText( `Vidas: ${ state.lives }`, CANVAS_WIDTH - 16, 28 );
 }
@@ -367,6 +409,19 @@ function renderPauseOverlay() {
   ctx.fillText( 'PAUSADO', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 );
 }
 
+function renderLevelUpOverlay() {
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+  ctx.fillRect( 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT );
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '32px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText( `Nivel ${ state.level } completado`, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 20 );
+
+  ctx.font = '24px monospace';
+  ctx.fillText( 'Presiona ESPACIO para continuar', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 20 );
+}
+
 function render() {
   ctx.clearRect( 0, 0, canvas.width, canvas.height );
 
@@ -377,6 +432,9 @@ function render() {
   } else if ( state.screen === 'paused' ) {
     renderPlayingScene();
     renderPauseOverlay();
+  } else if ( state.screen === 'levelup' ) {
+    renderPlayingScene();
+    renderLevelUpOverlay();
   } else if ( state.screen === 'gameover' ) {
     renderGameOverScreen();
   } else if ( state.screen === 'win' ) {
