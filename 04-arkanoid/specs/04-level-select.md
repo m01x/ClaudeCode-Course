@@ -1,6 +1,6 @@
 # SPEC 04 — Selección de nivel inicial
 
-> **Status:** Draft
+> **Status:** Implemented
 > **Depends on:** SPEC 01, SPEC 02
 > **Date:** 2026-07-09
 > **Objective:** Permitir elegir en la pantalla de inicio el nivel (1 a 10) en el que arranca la partida, tipeando su dígito (1-9, 0 para el nivel 10) antes de confirmar con Espacio, que sigue iniciando en el nivel 1 por defecto.
@@ -50,15 +50,15 @@ Conventions:
 
 ## Acceptance criteria
 
-- [ ] Al cargar la página, `state.selectedLevel` es `1` y la pantalla de inicio muestra "Nivel seleccionado: 1".
-- [ ] En la pantalla de inicio, presionar un dígito del 1 al 9 actualiza `state.selectedLevel` a ese número y el texto en pantalla lo refleja.
-- [ ] En la pantalla de inicio, presionar el dígito 0 fija `state.selectedLevel` en 10 y el texto en pantalla muestra "Nivel seleccionado: 10".
-- [ ] Presionar Espacio en `'start'` sin tipear ningún dígito inicia la partida en el nivel 1 (comportamiento actual preservado).
-- [ ] Presionar Espacio en `'start'` después de tipear un dígito inicia la partida directamente en el nivel elegido, con la cantidad de filas de bloques (`rowsForLevel`) y el ancho de paddle (`paddleWidthForLevel`) correspondientes a ese nivel.
-- [ ] Al arrancar en cualquier nivel > 1, el score inicia en 0 y las vidas en `STARTING_LIVES` (3).
-- [ ] Tipear dígitos fuera de la pantalla `'start'` (durante `'playing'`, `'paused'`, `'levelup'`, `'gameover'`, `'win'`) no tiene ningún efecto sobre `state.level` ni `state.selectedLevel`.
-- [ ] Al perder todas las vidas o ganar habiendo arrancado en un nivel > 1, presionar Espacio en Game Over/Victoria vuelve a `'start'` con "Nivel seleccionado: 1" (no se conserva el nivel de la partida anterior).
-- [ ] Los 10 niveles son seleccionables desde el inicio sin ninguna restricción de desbloqueo.
+- [x] Al cargar la página, `state.selectedLevel` es `1` y la pantalla de inicio muestra "Nivel seleccionado: 1".
+- [x] En la pantalla de inicio, presionar un dígito del 1 al 9 actualiza `state.selectedLevel` a ese número y el texto en pantalla lo refleja.
+- [x] En la pantalla de inicio, presionar el dígito 0 fija `state.selectedLevel` en 10 y el texto en pantalla muestra "Nivel seleccionado: 10".
+- [x] Presionar Espacio en `'start'` sin tipear ningún dígito inicia la partida en el nivel 1 (comportamiento actual preservado).
+- [x] Presionar Espacio en `'start'` después de tipear un dígito inicia la partida directamente en el nivel elegido, con la cantidad de filas de bloques (`rowsForLevel`) y el ancho de paddle (`paddleWidthForLevel`) correspondientes a ese nivel.
+- [x] Al arrancar en cualquier nivel > 1, el score inicia en 0 y las vidas en `STARTING_LIVES` (3).
+- [x] Tipear dígitos fuera de la pantalla `'start'` (durante `'playing'`, `'paused'`, `'levelup'`, `'gameover'`, `'win'`) no tiene ningún efecto sobre `state.level` ni `state.selectedLevel`.
+- [x] Al perder todas las vidas o ganar habiendo arrancado en un nivel > 1, presionar Espacio en Game Over/Victoria vuelve a `'start'` con "Nivel seleccionado: 1" (no se conserva el nivel de la partida anterior).
+- [x] Los 10 niveles son seleccionables desde el inicio sin ninguna restricción de desbloqueo.
 
 ## Decisions
 

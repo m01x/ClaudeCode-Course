@@ -44,6 +44,7 @@ const state = {
   score: 0,
   lives: STARTING_LIVES,
   level: 1, // 1..MAX_LEVEL
+  selectedLevel: 1, // 1..MAX_LEVEL; solo relevante en screen 'start'
   paddle: {
     x: ( CANVAS_WIDTH - PADDLE.width ) / 2,
     y: CANVAS_HEIGHT - 40,
@@ -116,6 +117,7 @@ function resetGame() {
   state.score = 0;
   state.lives = STARTING_LIVES;
   state.level = 1;
+  state.selectedLevel = 1;
 
   state.paddle.width = PADDLE_WIDTH_BASE;
   state.paddle.x = ( CANVAS_WIDTH - state.paddle.width ) / 2;
@@ -135,6 +137,10 @@ window.addEventListener( 'keydown', ( e ) => {
   if ( e.code === 'Space' ) {
     e.preventDefault();
     if ( state.screen === 'start' ) {
+      state.level = state.selectedLevel;
+      state.blocks = createBlocksForLevel( state.level );
+      state.paddle.width = paddleWidthForLevel( state.level );
+      state.paddle.x = Math.max( 0, Math.min( CANVAS_WIDTH - state.paddle.width, state.paddle.x ) );
       state.screen = 'playing';
     } else if ( state.screen === 'playing' && state.ball.attached ) {
       state.ball.attached = false;
@@ -166,6 +172,11 @@ window.addEventListener( 'keydown', ( e ) => {
     if ( state.screen === 'playing' || state.screen === 'paused' ) {
       state.muted = !state.muted;
     }
+  }
+
+  if ( state.screen === 'start' && e.code.startsWith( 'Digit' ) ) {
+    const digit = Number( e.code.slice( 5 ) );
+    state.selectedLevel = digit === 0 ? 10 : digit;
   }
 
   if ( e.code in keys ) {
@@ -340,6 +351,7 @@ function renderStartScreen() {
   ctx.font = '24px monospace';
   ctx.textAlign = 'center';
   ctx.fillText( 'Presiona ESPACIO para iniciar', CANVAS_WIDTH / 2, 380 );
+  ctx.fillText( `Nivel seleccionado: ${ state.selectedLevel }`, CANVAS_WIDTH / 2, 420 );
 }
 
 function renderPaddle() {
