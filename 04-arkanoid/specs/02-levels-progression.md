@@ -1,6 +1,6 @@
 # SPEC 02 — Progresión de niveles
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-07-08
 > **Objective:** Añadir progresión de 10 niveles al Arkanoid: al vaciar los bloques de la pantalla, el jugador confirma con Espacio el paso al siguiente nivel, que trae una nueva distribución de bloques generada proceduralmente, una bola más rápida, y —desde el nivel 3 en adelante— un paddle más pequeño.
@@ -80,7 +80,7 @@ Conventions:
 
 - [x] Al vaciar los bloques del nivel 1 (con `level < 10`), el juego se congela y aparece un overlay "Nivel 1 completado - Presiona ESPACIO para continuar".
 - [x] Presionar Espacio en el overlay pasa a `level 2`, genera una nueva distribución de bloques y vuelve a `'playing'`.
-- [ ] La velocidad de la bola en el nivel 2 es mayor que en el nivel 1, y en el nivel 3 mayor que en el nivel 2, siguiendo `speedForLevel`.
+- [x] La velocidad de la bola en el nivel 2 es mayor que en el nivel 1, y en el nivel 3 mayor que en el nivel 2, siguiendo `speedForLevel`.
 - [x] La velocidad de la bola nunca supera `BALL_MAX_SPEED` (12) sin importar el nivel.
 - [x] Desde el nivel 3 en adelante el paddle mide `PADDLE_WIDTH_REDUCED` (70px) en vez de 100px.
 - [x] En los niveles 1 y 2 el paddle mide el ancho base (100px).
