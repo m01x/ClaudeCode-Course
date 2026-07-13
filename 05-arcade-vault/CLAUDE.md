@@ -11,14 +11,7 @@ structure may differ from what you expect. Before writing or editing any Next.js
 guide under `node_modules/next/dist/docs/` (organized into `01-app`, `02-pages`, `03-architecture`,
 `04-community`) and follow any deprecation notices found there instead of assuming prior knowledge.
 
-## Commands
 
-```bash
-npm run dev     # start dev server
-npm run build   # production build
-npm run start   # run production build
-npm run lint    # eslint (flat config, eslint-config-next core-web-vitals + typescript)
-```
 
 There is no test script/framework configured yet.
 
@@ -36,3 +29,7 @@ This project follows the spec-driven workflow from `Klerith/fernando-skills`, us
 implements it. Sibling modules in this course repo (e.g. the arkanoid game) keep specs under a
 `specs/` folder next to the code they describe and record spec status (e.g. "Implemented") — follow the
 same pattern here once specs are introduced for arcade-vault features.
+
+
+## Skills
+Usa siempre /front-design para diseñar la interfaz de usuario.
