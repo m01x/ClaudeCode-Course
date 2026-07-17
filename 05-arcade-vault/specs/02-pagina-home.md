@@ -1,6 +1,6 @@
 # SPEC 02 — Página de Home (landing) de Arcade Vault
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** 01-pantallas-visuales
 > **Date:** 2026-07-16
 > **Objective:** Portar la landing page Home del prototipo (`references/templates/home-about/home.jsx`) a `/` en Next.js, moviendo la Biblioteca actual a `/biblioteca` y dejando en el Nav un enlace "Acerca de" que cae en la 404 existente, sin implementar la página About.
