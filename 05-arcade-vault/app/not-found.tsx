@@ -22,7 +22,7 @@ export default function NotFound() {
       <p className="max-w-md text-sm" style={{ color: "var(--ink-dim)" }}>
         Esta pantalla no existe o el cartucho fue removido. Vuelve a la biblioteca antes de que se acabe el crédito.
       </p>
-      <Link href="/" className="btn lg mt-4">
+      <Link href="/biblioteca" className="btn lg mt-4">
         VOLVER AL VAULT
       </Link>
     </div>
